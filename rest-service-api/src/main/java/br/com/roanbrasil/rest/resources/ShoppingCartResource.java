@@ -31,6 +31,7 @@ public class ShoppingCartResource {
 
 	/**
 	 * interface that search a shoppingCart by Id
+	 * 
 	 * @param id
 	 * @return String - XML
 	 */
@@ -44,6 +45,7 @@ public class ShoppingCartResource {
 
 	/**
 	 * Add Products in a new ShoppingCart
+	 * 
 	 * @param content
 	 * @return Response
 	 */
@@ -57,16 +59,18 @@ public class ShoppingCartResource {
 		URI uri = URI.create("/shoppingcart/search/" + shoppingCart.getId());
 		return Response.created(uri).build();
 	}
-	
+
 	/**
+	 * Interface to remove product from a ShoppingCart List
 	 * 
 	 * @return String
 	 */
 	@Path("{id}/products/{productId}")
 	@DELETE
-	public String removeProduct(){
-		
-		
-		return null;
+	public Response removeProduct(@PathParam("id") long id,
+			@PathParam("productId") long productId) {
+		ShoppingCart shoppingCart = new ShoppingCartDAO().search(id);
+		shoppingCart.remove(productId);
+		return Response.ok().build();
 	}
 }
