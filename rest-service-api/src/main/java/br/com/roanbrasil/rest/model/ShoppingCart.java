@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.google.gson.Gson;
-import com.thoughtworks.xstream.XStream;
+import br.com.roanbrasil.rest.dao.ShoppingCartDAO;
+import br.com.roanbrasil.rest.processor.chain.CalculatorTotalAmountAndDiscount;
 
 /**
  * This Shopping Cart Model, here you can add products, delivery in some
@@ -16,7 +16,7 @@ import com.thoughtworks.xstream.XStream;
  * @since 2015-03-14
  *
  */
-public class ShoppingCart {
+public class ShoppingCart extends BasicModel{
 
 	private List<Product> products = new ArrayList<>();
 	private String street;
@@ -36,6 +36,7 @@ public class ShoppingCart {
 
 	/**
 	 * Set all the delivery Location
+	 * 
 	 * @param street
 	 * @param city
 	 * @return {@link ShoppingCart} - ShoppingCart
@@ -48,6 +49,7 @@ public class ShoppingCart {
 
 	/**
 	 * remove Product from ShoppingCart
+	 * 
 	 * @param id
 	 */
 	public void remove(long id) {
@@ -63,6 +65,7 @@ public class ShoppingCart {
 
 	/**
 	 * Change a Product for Another one
+	 * 
 	 * @param product
 	 */
 	public void change(Product product) {
@@ -72,18 +75,34 @@ public class ShoppingCart {
 
 	/**
 	 * Change a number of Products in Shopping Cart
+	 * 
 	 * @param product
 	 */
 	public void changeNumberOfProducts(Product product) {
 		for (Iterator<Product> iterator = products.iterator(); iterator
 				.hasNext();) {
 			Product p = iterator.next();
-			//if the product id are the same the quantity should be as well
+			// if the product id are the same the quantity should be as well
 			if (p.getId() == product.getId()) {
 				p.setQuantity(product.getQuantity());
 				return;
 			}
 		}
+	}
+
+	/**
+	 * 
+	 * @param id
+	 * @return double
+	 */
+	public PaymentTotalAmount getTotalAmountAndDiscount(long id) {
+		ShoppingCart shoppingCart = new ShoppingCartDAO().search(id);
+		CalculatorTotalAmountAndDiscount calculator = new CalculatorTotalAmountAndDiscount();
+		PaymentTotalAmount paymentTotalAmount = calculator
+				.calculateDiscountAmount(shoppingCart);
+
+		return paymentTotalAmount;
+
 	}
 
 	/**
@@ -164,21 +183,5 @@ public class ShoppingCart {
 	public ShoppingCart setId(long id) {
 		this.id = id;
 		return this;
-	}
-
-	/**
-	 * 
-	 * @return String
-	 */
-	public String toXML() {
-		return new XStream().toXML(this);
-	}
-
-	/**
-	 * 
-	 * @return String
-	 */
-	public String toJson() {
-		return new Gson().toJson(this);
 	}
 }

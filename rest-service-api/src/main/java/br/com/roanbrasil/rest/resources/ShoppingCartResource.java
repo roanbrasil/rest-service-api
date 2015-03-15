@@ -18,6 +18,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import br.com.roanbrasil.rest.dao.ShoppingCartDAO;
+import br.com.roanbrasil.rest.model.PaymentTotalAmount;
 import br.com.roanbrasil.rest.model.Product;
 import br.com.roanbrasil.rest.model.ShoppingCart;
 
@@ -43,6 +44,22 @@ public class ShoppingCartResource {
 	public String search(@PathParam("id") long id) {
 		ShoppingCart shoppingCart = new ShoppingCartDAO().search(id);
 		return shoppingCart.toXML();
+	}
+
+	/**
+	 * interface that search a shoppingCart by Id
+	 * 
+	 * @param id
+	 * @return String - XML
+	 */
+	@GET
+	@Path("getTotalAmount/{id}")
+	@Produces(MediaType.APPLICATION_XML)
+	public String getTotalAmount(@PathParam("id") long id) {
+		PaymentTotalAmount paymentTotalAmount = new ShoppingCart()
+				.getTotalAmountAndDiscount(id);
+
+		return paymentTotalAmount.toXML();
 	}
 
 	/**
@@ -77,19 +94,19 @@ public class ShoppingCartResource {
 	}
 
 	/**
-	 * s
+	 * Change the quantity of the product
 	 * 
 	 * @param id
 	 * @param productId
 	 * @return
 	 */
-	@Path("{id}/products/{productId}")
+	@Path("{id}/products/{productId}/quantity")
 	@PUT
 	public Response changeQuantity(String content, @PathParam("id") long id,
 			@PathParam("productId") long productId) {
 		ShoppingCart shoppingCart = new ShoppingCartDAO().search(id);
 		Product product = (Product) new XStream().fromXML(content);
-		shoppingCart.change(product);
+		shoppingCart.changeNumberOfProducts(product);
 		return Response.ok().build();
 	}
 }
