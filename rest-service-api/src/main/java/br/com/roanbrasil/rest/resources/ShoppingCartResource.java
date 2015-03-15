@@ -10,6 +10,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -17,6 +18,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import br.com.roanbrasil.rest.dao.ShoppingCartDAO;
+import br.com.roanbrasil.rest.model.Product;
 import br.com.roanbrasil.rest.model.ShoppingCart;
 
 import com.thoughtworks.xstream.XStream;
@@ -71,6 +73,23 @@ public class ShoppingCartResource {
 			@PathParam("productId") long productId) {
 		ShoppingCart shoppingCart = new ShoppingCartDAO().search(id);
 		shoppingCart.remove(productId);
+		return Response.ok().build();
+	}
+
+	/**
+	 * s
+	 * 
+	 * @param id
+	 * @param productId
+	 * @return
+	 */
+	@Path("{id}/products/{productId}")
+	@PUT
+	public Response changeQuantity(String content, @PathParam("id") long id,
+			@PathParam("productId") long productId) {
+		ShoppingCart shoppingCart = new ShoppingCartDAO().search(id);
+		Product product = (Product) new XStream().fromXML(content);
+		shoppingCart.change(product);
 		return Response.ok().build();
 	}
 }
