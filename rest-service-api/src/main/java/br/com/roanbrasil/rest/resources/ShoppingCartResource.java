@@ -17,6 +17,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Logger;
+
 import br.com.roanbrasil.rest.dao.ShoppingCartDAO;
 import br.com.roanbrasil.rest.model.PaymentTotalAmount;
 import br.com.roanbrasil.rest.model.Product;
@@ -31,6 +34,8 @@ import com.thoughtworks.xstream.XStream;
 @Singleton
 @Path("shoppingcart")
 public class ShoppingCartResource {
+	
+	static Logger log = Logger.getLogger(ShoppingCartResource.class);
 
 	/**
 	 * interface that search a shoppingCart by Id
@@ -42,7 +47,10 @@ public class ShoppingCartResource {
 	@Path("search/{id}")
 	@Produces(MediaType.APPLICATION_XML)
 	public String search(@PathParam("id") long id) {
+		BasicConfigurator.configure();
+		log.info("Search API called for id:["+id+"]");
 		ShoppingCart shoppingCart = new ShoppingCartDAO().search(id);
+		log.info("XML dump:\n "+shoppingCart.toXML());
 		return shoppingCart.toXML();
 	}
 
@@ -56,9 +64,10 @@ public class ShoppingCartResource {
 	@Path("getTotalAmount/{id}")
 	@Produces(MediaType.APPLICATION_XML)
 	public String getTotalAmount(@PathParam("id") long id) {
+		log.info("GetTotalAmount API called for id:["+id+"]");
 		PaymentTotalAmount paymentTotalAmount = new ShoppingCart()
 				.getTotalAmountAndDiscount(id);
-
+		log.info("XML dump:\n "+paymentTotalAmount.toXML());
 		return paymentTotalAmount.toXML();
 	}
 
@@ -71,6 +80,7 @@ public class ShoppingCartResource {
 	@POST
 	@Consumes(MediaType.APPLICATION_XML)
 	public Response add(String content) {
+		log.info("Add new content request \n["+content+"]");
 		ShoppingCart shoppingCart = (ShoppingCart) new XStream()
 				.fromXML(content);
 		new ShoppingCartDAO().add(shoppingCart);
